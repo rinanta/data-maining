@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skin Cancer Classification System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* --- Upload widget (scoped, doesn't touch existing style.css) --- */
+  .upload-box{
+    border:2px dashed var(--color-primary, #3b82f6);
+    border-radius:16px;
+    background:rgba(59,130,246,0.05);
+    padding:28px;
+    text-align:center;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+    position:relative;
+  }
+  .upload-box.drag-over{
+    background:rgba(59,130,246,0.12);
+    border-color:var(--color-primary, #2563eb);
+  }
+  .upload-box input[type="file"]{
+    position:absolute; inset:0; opacity:0; cursor:pointer;
+  }
+  .upload-box .upload-icon{
+    width:44px;height:44px;margin:0 auto 12px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    background:rgba(59,130,246,0.12);
+    color:var(--color-primary, #2563eb);
+  }
+  .upload-box h4{margin:0 0 4px;font-weight:600;}
+  .upload-box p{margin:0;font-size:13px;opacity:.7;}
+  .upload-preview{
+    margin-top:16px;
+    display:none;
+    align-items:center;
+    gap:14px;
+    padding:12px;
+    border-radius:12px;
+    background:rgba(0,0,0,0.03);
+    text-align:left;
+  }
+  .upload-preview.show{display:flex;}
+  .upload-preview img{
+    width:64px;height:64px;object-fit:cover;border-radius:10px;flex-shrink:0;
+  }
+  .upload-preview .file-info{flex:1;min-width:0;}
+  .upload-preview .file-info strong{display:block;font-size:14px;word-break:break-all;}
+  .upload-preview .file-info span{font-size:12px;opacity:.65;}
+  .upload-preview .remove-file{
+    background:none;border:none;cursor:pointer;opacity:.6;
+  }
+  .upload-preview .remove-file:hover{opacity:1;}
+  .upload-actions{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;}
+  .upload-actions .btn[disabled]{opacity:.5;pointer-events:none;}
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="wrap">
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="detection.html">Detection</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-blob"></div>
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1>Skin Cancer<span>Classification System</span></h1>
+      <p class="lead">A web application that classifies dermoscopic skin lesion images into Benign or Malignant using Deep Inpainting and Deep Convolutional Neural Network (DCNN).</p>
+      <div class="actions">
+        <a href="#technologies" class="btn btn-outline">Learn More</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong>10,015</strong><span>Training images</span></div>
+        <div class="hero-stat"><strong>7</strong><span>Pipeline stages</span></div>
+        <div class="hero-stat"><strong>2</strong><span>Diagnostic classes</span></div>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <div class="card" style="padding:24px;">
+        <div class="performance-head" style="margin-bottom:16px;">
+          <span class="icon-wrap"><i data-lucide="upload-cloud" style="width:16px;height:16px"></i></span>
+          Upload Lesion Image
+        </div>
+
+        <form id="uploadForm">
+          <label class="upload-box" id="uploadBox">
+            <input type="file" id="fileInput" accept="image/png, image/jpeg, image/jpg" />
+            <div class="upload-icon"><i data-lucide="image-plus"></i></div>
+            <h4>Drag &amp; drop your image here</h4>
+            <p>or click to browse — PNG / JPG, up to 10MB</p>
+          </label>
+
+          <div class="upload-preview" id="uploadPreview">
+            <img id="previewImg" src="" alt="Selected lesion preview">
+            <div class="file-info">
+              <strong id="fileName"></strong>
+              <span id="fileSize"></span>
+            </div>
+            <button type="button" class="remove-file" id="removeFile" aria-label="Remove file">
+              <i data-lucide="x" style="width:18px;height:18px"></i>
+            </button>
+          </div>
+
+          <div class="upload-actions">
+            <button type="submit" class="btn btn-primary" id="analyzeBtn" disabled>
+              Analyze Image <i data-lucide="scan-eye" style="width:16px;height:16px"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="scan-chips">
+        <div class="chip"><i data-lucide="wand-sparkles"></i>Deep Inpainting</div>
+        <div class="chip"><i data-lucide="network"></i>DCNN</div>
+        <div class="chip"><i data-lucide="layout-grid"></i>HAM10000</div>
+        <div class="chip"><i data-lucide="bar-chart-3"></i>Evaluation</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">01 — Pipeline</div>
+      <h2>Precision Workflow</h2>
+      <p>A sophisticated 7-step process ensuring diagnostic accuracy and medical-grade reliability.</p>
+    </div>
+
+    <div class="workflow-track">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-card">
+          <div class="icon"><i data-lucide="upload"></i></div>
+          <h4>Upload Image</h4>
+          <p>Secure image upload</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-card">
+          <div class="icon"><i data-lucide="search"></i></div>
+          <h4>Hair Artifact Detection</h4>
+          <p>Scan for obstructions</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-card">
+          <div class="icon"><i data-lucide="crop"></i></div>
+          <h4>Binary Mask Generation</h4>
+          <p>Isolating lesion area</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-card">
+          <div class="icon"><i data-lucide="wand-sparkles"></i></div>
+          <h4>Deep Inpainting</h4>
+          <p>Removing artifacts</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-card">
+          <div class="icon"><i data-lucide="scan-line"></i></div>
+          <h4>Resize &amp; Normalization</h4>
+          <p>Data preprocessing</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-card">
+          <div class="icon"><i data-lucide="network"></i></div>
+          <h4>Deep CNN</h4>
+          <p>Neural analysis</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-card is-final">
+          <div class="icon"><i data-lucide="check-circle-2"></i></div>
+          <h4>Prediction Result</h4>
+          <p>Final classification</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-bg" id="technologies">
+  <div class="wrap">
+    <div class="tech-grid">
+      <div>
+        <div class="section-head left">
+          <div class="section-eyebrow">02 — Stack</div>
+          <h2>Cutting-Edge Technologies</h2>
+          <p>Our system integrates advanced computational photography and deep learning to deliver highly accurate clinical insights.</p>
+        </div>
+
+        <div class="feature-cards">
+          <div class="feature-card blue">
+            <div class="icon-badge"><i data-lucide="paintbrush"></i></div>
+            <h4>Deep Inpainting</h4>
+            <p>Intelligent removal of hair and artifacts for cleaner diagnostic imaging.</p>
+          </div>
+          <div class="feature-card teal">
+            <div class="icon-badge"><i data-lucide="cpu"></i></div>
+            <h4>DCNN</h4>
+            <p>Deep Convolutional Neural Networks trained for multi-class classification.</p>
+          </div>
+          <div class="feature-card blue">
+            <div class="icon-badge"><i data-lucide="database"></i></div>
+            <h4>HAM10000</h4>
+            <p>Validated using a diverse dataset of 10,015 dermatoscopic images.</p>
+          </div>
+          <div class="feature-card teal">
+            <div class="icon-badge"><i data-lucide="bar-chart-3"></i></div>
+            <h4>Metrics</h4>
+            <p>Rigorous evaluation including accuracy, sensitivity, and specificity.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-illustration">
+        <div class="tech-illustration-inner">
+          <div class="tech-illustration-grid">
+            <div>
+              <div class="icon-wrap"><i data-lucide="brain-cog"></i></div>
+              <span>1. Deep Inpainting</span>
+            </div>
+            <div>
+              <div class="icon-wrap"><i data-lucide="network"></i></div>
+              <span>2. DCNN</span>
+            </div>
+            <div>
+              <div class="icon-wrap"><i data-lucide="grid-3x3"></i></div>
+              <span>3. HAM10000 Dataset</span>
+            </div>
+            <div>
+              <div class="icon-wrap"><i data-lucide="bar-chart-3"></i></div>
+              <span>4. Evaluation Metrics</span>
+            </div>
+          </div>
+          <div class="tech-illustration-caption">Medical AI Solutions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>&copy; 2026 Skin Cancer Classification System. Built for research &amp; educational purposes.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="script.js"></script>
+<script>
+  (function () {
+    const box = document.getElementById('uploadBox');
+    const input = document.getElementById('fileInput');
+    const preview = document.getElementById('uploadPreview');
+    const previewImg = document.getElementById('previewImg');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeBtn = document.getElementById('removeFile');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const form = document.getElementById('uploadForm');
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImg.src = e.target.result;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatSize(file.size);
+        preview.classList.add('show');
+        analyzeBtn.removeAttribute('disabled');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    input.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    ['dragenter', 'dragover'].forEach((evt) => {
+      box.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        box.classList.add('drag-over');
+      });
+    });
+    ['dragleave', 'drop'].forEach((evt) => {
+      box.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        box.classList.remove('drag-over');
+      });
+    });
+    box.addEventListener('drop', (e) => {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) {
+        input.files = e.dataTransfer.files;
+        handleFile(file);
+      }
+    });
+
+    removeBtn.addEventListener('click', () => {
+      input.value = '';
+      preview.classList.remove('show');
+      analyzeBtn.setAttribute('disabled', 'true');
+    });
+
+    // --- DI SINI PERUBAHAN UTAMA UNTUK OPER DATA ---
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!input.files || !input.files[0]) return;
+
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (event) {
+        // Simpan gambar (Base64 string) & nama file ke sessionStorage browser
+        sessionStorage.setItem('uploadedImage', event.target.result);
+        sessionStorage.setItem('uploadedFileName', file.name);
+        
+        // Pindah ke halaman hasil deteksi
+        window.location.href = 'detection.html';
+      };
+
+      reader.readAsDataURL(file);
+    });
+  })();
+</script>
+</body>
+</html>
